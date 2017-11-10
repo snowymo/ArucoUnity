@@ -1,5 +1,6 @@
 #include <cstdint>
 #include <stddef.h>
+#include <winsock2.h>
 
 #define DEV_ADDR_0 "192.168.1.77"
 #define DEV_ADDR_1 "192.168.1.78"
@@ -59,6 +60,49 @@ int deserialize(char *buf, target &data) {
   data.rot_y = *tra; tra++;
   data.rot_z = *tra; tra++;
   data.rot_w = *tra; tra++;
+
+  return 0;
+}
+
+struct sender {
+  static sockaddr_in dev0, dev1;
+  static WSADATA wsa;
+  static int sock;
+};
+
+int initSender() {
+  if (WSAStartup(MAKEWORD(2, 2), &sender::wsa) != 0) {
+    printf("Error during init: %d\n", WSAGetLastError());
+    return 1;
+  }
+
+  sender::sock = socket(
+    AF_INET,
+    SOCK_DGRAM,
+    IPPROTO_UDP
+  );
+
+  if (sender::sock == SOCKET_ERROR) {
+    printf("Socket error: %d\n", WSAGetLastError());
+    return 1;
+  }
+
+  memset((char*)&sender::dev0, 0, sizeof(sender::dev0));
+  sender::dev0.sin_family = AF_INET;
+  sender::dev0.sin_port = htons(PORT);
+  sender::dev0.sin_addr.S_un.S_addr = inet_addr(DEV_ADDR_0);
+
+  memset((char*)&sender::dev1, 0, sizeof(sender::dev1));
+  sender::dev1.sin_family = AF_INET;
+  sender::dev1.sin_port = htons(PORT);
+  sender::dev1.sin_addr.S_un.S_addr = inet_addr(DEV_ADDR_1);
+
+  return 0;
+}
+
+int cleanupSender() {
+  closesocket(sender::sock);
+  WSACleanup();
 
   return 0;
 }
