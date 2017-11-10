@@ -106,3 +106,44 @@ int cleanupSender() {
 
   return 0;
 }
+
+int sendData(const target &data) {
+  /* Build packet */
+
+  char buf[target::SIZE];
+  serialize(data, buf);
+
+  /* Unicast to devices */
+
+  int err;
+
+  err = sendto(
+    sock,
+    buf,
+    target::SIZE,
+    0,
+    (struct sockaddr*)&sender::dev0,
+    sizeof(sender::dev0)
+  );
+
+  if (err == SOCKET_ERR) {
+    printf("Error during send: %d\n", WSAGetLastError());
+    return 1;
+  }
+
+  err = sendto(
+    sock,
+    buf,
+    target::SIZE,
+    0,
+    (struct sockaddr*)&sender::dev1,
+    sizeof(sender::dev1)
+  );
+
+  if (err == SOCKET_ERR) {
+    printf("Error during send: %d\n", WSAGetLastError());
+    return 1;
+  }
+
+  return 0;
+}
