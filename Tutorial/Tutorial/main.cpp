@@ -7,6 +7,8 @@
 #include <string>
 #include <iostream>
 
+cv::Mat cameraMatrix, distCoeffs;
+
 void createMarker(int markerid = 0) {
 	cv::Mat markerImage;
 	cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);
@@ -20,10 +22,9 @@ void createMarker(int markerid = 0) {
 	cv::imwrite("markers/marker_6x6_" + st + ".jpg",markerImage);
 }
 
-void detectMarker(cv::Mat& inputImage) {
+void detectMarker(std::vector< int >& markerIds, cv::Mat& inputImage, std::vector< std::vector<cv::Point2f> >& markerCorners) {
 	
-	std::vector< int > markerIds;
-	std::vector< std::vector<cv::Point2f> > markerCorners, rejectedCandidates;
+	std::vector< std::vector<cv::Point2f> >  rejectedCandidates;
 	//cv::aruco::DetectorParameters parameters = cv::aruco::DetectorParameters().create();
 	cv::Ptr < cv::aruco::DetectorParameters> parameters = new cv::aruco::DetectorParameters();
 	cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);
@@ -40,7 +41,16 @@ void videoDetect() {
 		cv::Mat image, imageCopy;
 		inputVideo.retrieve(image);
 		image.copyTo(imageCopy);
-		detectMarker(imageCopy);
+
+		std::vector< std::vector<cv::Point2f> > markerCorners;
+		std::vector< int > markerIds;
+		detectMarker(markerIds, imageCopy, markerCorners);
+
+		std::vector< cv::Vec3d > rvecs, tvecs;
+		cv::aruco::estimatePoseSingleMarkers(markerCorners, 0.05, cameraMatrix, distCoeffs, rvecs, tvecs);
+
+		for (int i = 0; i < markerIds.size(); i++)
+			cv::aruco::drawAxis(imageCopy, cameraMatrix, distCoeffs, rvecs[i], tvecs[i], 0.1);
 
 		cv::imshow("out", imageCopy);
 		char key = (char)cv::waitKey(waitTime);
@@ -50,9 +60,37 @@ void videoDetect() {
 }
 
 
+int loadCameraParameters() {
+	const std::string inputSettingsFile = "out_camera_data.xml";
+	cv::FileStorage fs(inputSettingsFile, cv::FileStorage::READ); // Read the settings
+	if (!fs.isOpened())
+	{
+		std::cout << "Could not open the configuration file: \"" << inputSettingsFile << "\"\n";
+		return -1;
+	}
+
+	//cv::Mat cameraMatrix, distCoeffs;
+
+	fs["camera_matrix"] >> cameraMatrix;
+	fs["distortion_coefficients"] >> distCoeffs;
+	int width;
+	fs["image_width"] >> width;
+	std::cout << "camera_matrix:" << cameraMatrix << "\n";
+	std::cout << "distortion_coefficients:" << distCoeffs << "\n";
+	std::cout << "width:" << width << "\n";
+	fs.release();
+}
+
+
 int main() {
 	/*for(int i = 0; i < 250; i++)
 		createMarker(i);*/
+
+	loadCameraParameters();
+
 	videoDetect();
+
+	
+	
 	return 0;
 }

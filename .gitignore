@@ -1,0 +1,10 @@
+Tutorial/Tutorial/x64/Debug/*
+
+
+*/*.opendb
+*/*.VC.db
+
+*/.vs/
+
+*/x64/*/*.ilk
+*/x64/*/*.pdb
