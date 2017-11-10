@@ -68,6 +68,7 @@ struct sender {
   static sockaddr_in dev0, dev1;
   static WSADATA wsa;
   static int sock;
+  static size_t devlen;
 };
 
 int initSender() {
@@ -97,6 +98,8 @@ int initSender() {
   sender::dev1.sin_port = htons(PORT);
   sender::dev1.sin_addr.S_un.S_addr = inet_addr(DEV_ADDR_1);
 
+  sender::devlen = sizeof(sender::dev0);
+
   return 0;
 }
 
@@ -123,7 +126,7 @@ int sendData(const target &data) {
     target::SIZE,
     0,
     (struct sockaddr*)&sender::dev0,
-    sizeof(sender::dev0)
+    sender::devlen
   );
 
   if (err == SOCKET_ERR) {
@@ -137,7 +140,7 @@ int sendData(const target &data) {
     target::SIZE,
     0,
     (struct sockaddr*)&sender::dev1,
-    sizeof(sender::dev1)
+    sender::devlen
   );
 
   if (err == SOCKET_ERR) {
