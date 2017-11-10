@@ -15,6 +15,46 @@ struct target {
   double rot_w;
 };
 
+int serialize(target &data, char *buf) {
+  uint16_t *ids = (uint16_t*)buf;
+
+  *ids = data.cam_id;    ids++;
+  *ids = data.target_id; ids++;
+
+  double *tra = (double*)buf;
+
+  *tra = data.pos_x; tra++;
+  *tra = data.pos_y; tra++;
+  *tra = data.pos_z; tra++;
+
+  *tra = data.rot_x; tra++;
+  *tra = data.rot_y; tra++;
+  *tra = data.rot_z; tra++;
+  *tra = data.rot_w; tra++;
+
+  return 0;
+}
+
+int deserialize(char *buf, target &data) {
+  uint16_t *ids = (uint16_t*)buf;
+
+  data.cam_id = *ids;    ids++;
+  data.target_id = *ids; ids++;
+
+  double *tra = (double*)buf;
+
+  data.pos_x = *tra; tra++;
+  data.pos_y = *tra; tra++;
+  data.pos_z = *tra; tra++;
+
+  data.rot_x = *tra; tra++;
+  data.rot_y = *tra; tra++;
+  data.rot_z = *tra; tra++;
+  data.rot_w = *tra; tra++;
+
+  return 0;
+}
+
 int sendData(const target &data) {
 
   /* Build packet */
