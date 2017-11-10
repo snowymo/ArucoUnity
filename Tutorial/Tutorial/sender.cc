@@ -22,7 +22,7 @@ struct target {
   double rot_w;
 };
 
-int serialize(target &data, char *buf) {
+int serialize(const target &data, char *buf) {
   uint16_t *ids = (uint16_t*)buf;
 
   *ids = data.cam_id;    ids++;
@@ -65,7 +65,8 @@ int deserialize(char *buf, target &data) {
 int sendData(const target &data) {
   /* Build packet */
 
-  //
+  char buf[target::SIZE];
+  serialize(data, buf);
 
   /* Unicast to devices */
 
