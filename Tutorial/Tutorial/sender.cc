@@ -1,8 +1,9 @@
 #include <cstdint>
 #include <stddef.h>
 
-#define DEV_ADDR_0 192.168.1.77
-#define DEV_ADDR_1 192.168.1.78
+#define DEV_ADDR_0 "192.168.1.77"
+#define DEV_ADDR_1 "192.168.1.78"
+#define PORT 9591
 
 struct target {
   static const size_t SIZE
@@ -60,15 +61,4 @@ int deserialize(char *buf, target &data) {
   data.rot_w = *tra; tra++;
 
   return 0;
-}
-
-int sendData(const target &data) {
-  /* Build packet */
-
-  char buf[target::SIZE];
-  serialize(data, buf);
-
-  /* Unicast to devices */
-
-  return 1;
 }
