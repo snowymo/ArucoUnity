@@ -28,7 +28,7 @@ int serialize(const target &data, char *buf) {
   *ids = data.cam_id;    ids++;
   *ids = data.target_id; ids++;
 
-  double *tra = (double*)buf;
+  double *tra = (double*)ids;
 
   *tra = data.pos_x; tra++;
   *tra = data.pos_y; tra++;
@@ -48,7 +48,7 @@ int deserialize(char *buf, target &data) {
   data.cam_id = *ids;    ids++;
   data.target_id = *ids; ids++;
 
-  double *tra = (double*)buf;
+  double *tra = (double*)ids;
 
   data.pos_x = *tra; tra++;
   data.pos_y = *tra; tra++;
