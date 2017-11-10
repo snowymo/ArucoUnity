@@ -1,5 +1,7 @@
-
 #include <cstdint>
+
+#define DEV_ADDR_0 192.168.1.77
+#define DEV_ADDR_1 192.168.1.78
 
 struct target {
   uint16_t cam_id;
@@ -19,5 +21,5 @@ int sendData(const target &data) {
 
   /* Unicast to devices */
 
-  return 0;
+  return 1;
 }
