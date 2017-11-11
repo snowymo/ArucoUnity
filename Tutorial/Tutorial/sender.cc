@@ -1,5 +1,6 @@
 #include <cstdint>
 #include <stddef.h>
+#include <stdio.h>
 #include <winsock2.h>
 
 #define DEV_ADDR_0 "192.168.1.77"
@@ -121,7 +122,7 @@ int sendData(const target &data) {
   int err;
 
   err = sendto(
-    sock,
+    sender::sock,
     buf,
     target::SIZE,
     0,
@@ -129,13 +130,13 @@ int sendData(const target &data) {
     sender::devlen
   );
 
-  if (err == SOCKET_ERR) {
+  if (err == SOCKET_ERROR) {
     printf("Error during send: %d\n", WSAGetLastError());
     return 1;
   }
 
   err = sendto(
-    sock,
+    sender::sock,
     buf,
     target::SIZE,
     0,
@@ -143,7 +144,7 @@ int sendData(const target &data) {
     sender::devlen
   );
 
-  if (err == SOCKET_ERR) {
+  if (err == SOCKET_ERROR) {
     printf("Error during send: %d\n", WSAGetLastError());
     return 1;
   }
