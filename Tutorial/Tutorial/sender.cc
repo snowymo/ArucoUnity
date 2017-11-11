@@ -1,7 +1,7 @@
 #include <cstdint>
 #include <stddef.h>
 #include <stdio.h>
-#include <winsock2.h>
+//#include <winsock2.h>
 
 #define DEV_ADDR_0 "192.168.1.77"
 #define DEV_ADDR_1 "192.168.1.78"
@@ -66,52 +66,52 @@ int deserialize(char *buf, target &data) {
 }
 
 struct sender {
-  static sockaddr_in dev0, dev1;
-  static WSADATA wsa;
-  static int sock;
-  static size_t devlen;
+  sockaddr_in dev0, dev1;
+  WSADATA wsa;
+  int sock;
+  size_t devlen;
 };
 
-int initSender() {
-  if (WSAStartup(MAKEWORD(2, 2), &sender::wsa) != 0) {
+int initSender(sender &s) {
+  if (WSAStartup(MAKEWORD(2, 2), &s.wsa) != 0) {
     printf("Error during init: %d\n", WSAGetLastError());
     return 1;
   }
 
-  sender::sock = socket(
+  s.sock = socket(
     AF_INET,
     SOCK_DGRAM,
     IPPROTO_UDP
   );
 
-  if (sender::sock == SOCKET_ERROR) {
+  if (s.sock == SOCKET_ERROR) {
     printf("Socket error: %d\n", WSAGetLastError());
     return 1;
   }
 
-  memset((char*)&sender::dev0, 0, sizeof(sender::dev0));
-  sender::dev0.sin_family = AF_INET;
-  sender::dev0.sin_port = htons(PORT);
-  sender::dev0.sin_addr.S_un.S_addr = inet_addr(DEV_ADDR_0);
+  memset((char*)&s.dev0, 0, sizeof(s.dev0));
+  s.dev0.sin_family = AF_INET;
+  s.dev0.sin_port = htons(PORT);
+  s.dev0.sin_addr.S_un.S_addr = inet_addr(DEV_ADDR_0);
 
-  memset((char*)&sender::dev1, 0, sizeof(sender::dev1));
-  sender::dev1.sin_family = AF_INET;
-  sender::dev1.sin_port = htons(PORT);
-  sender::dev1.sin_addr.S_un.S_addr = inet_addr(DEV_ADDR_1);
+  memset((char*)&s.dev1, 0, sizeof(s.dev1));
+  s.dev1.sin_family = AF_INET;
+  s.dev1.sin_port = htons(PORT);
+  s.dev1.sin_addr.S_un.S_addr = inet_addr(DEV_ADDR_1);
 
-  sender::devlen = sizeof(sender::dev0);
+  s.devlen = sizeof(s.dev0);
 
   return 0;
 }
 
-int cleanupSender() {
-  closesocket(sender::sock);
+int cleanupSender(const sender &s) {
+  closesocket(s.sock);
   WSACleanup();
 
   return 0;
 }
 
-int sendData(const target &data) {
+int sendData(const sender &s, const target &data) {
   /* Build packet */
 
   char buf[target::SIZE];
@@ -122,12 +122,12 @@ int sendData(const target &data) {
   int err;
 
   err = sendto(
-    sender::sock,
+    s.sock,
     buf,
     target::SIZE,
     0,
-    (struct sockaddr*)&sender::dev0,
-    sender::devlen
+    (struct sockaddr*)&s.dev0,
+    s.devlen
   );
 
   if (err == SOCKET_ERROR) {
@@ -136,12 +136,12 @@ int sendData(const target &data) {
   }
 
   err = sendto(
-    sender::sock,
+    s.sock,
     buf,
     target::SIZE,
     0,
-    (struct sockaddr*)&sender::dev1,
-    sender::devlen
+    (struct sockaddr*)&s.dev1,
+    s.devlen
   );
 
   if (err == SOCKET_ERROR) {
