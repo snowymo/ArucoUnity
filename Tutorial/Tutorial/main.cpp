@@ -1,46 +1,62 @@
-#include <opencv2/aruco.hpp>
-#include <opencv2/core.hpp>
-#include <opencv2/opencv.hpp>
+#include "opencv_helper.h"
 
 #include <vector>
 #include <stdlib.h>
 #include <string>
 #include <iostream>
 
+#include "target.h"
+
 cv::Mat cameraMatrix, distCoeffs;
 
-void createMarker(int markerid = 0) {
-	cv::Mat markerImage;
-	cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);
-	//int markerid = 23; //Concretely, this dictionary is composed by 250 markers. In this case, the valid ids go from 0 to 249
-	int markerPixels = 200; //In this case, the output image will have a size of 200x200 pixels
-	cv::aruco::drawMarker(dictionary, markerid, markerPixels, markerImage, 1);
-	char buffer[4];
-	_itoa(markerid, buffer, 10);
-	std::string st(buffer);
-	std::cout << "imwrite " << markerid << "\n";
-	cv::imwrite("markers/marker_6x6_" + st + ".jpg",markerImage);
+std::vector<target> targets;
+int machineId = 0;
+int videoFeed = 1;
+
+cv::Vec4d toQuaternion(cv::Vec3d rvec)
+{
+	cv::Vec4d q;
+	double pitch = rvec[0];
+	double roll = rvec[1];
+	double yaw = rvec[2];
+	// Abbreviations for the various angular functions
+	double cy = cos(yaw * 0.5);
+	double sy = sin(yaw * 0.5);
+	double cr = cos(roll * 0.5);
+	double sr = sin(roll * 0.5);
+	double cp = cos(pitch * 0.5);
+	double sp = sin(pitch * 0.5);
+
+	q[0] = cy * cr * cp + sy * sr * sp;
+	q[1] = cy * sr * cp - sy * cr * sp;
+	q[2] = cy * cr * sp + sy * sr * cp;
+	q[3] = sy * cr * cp - cy * sr * sp;
+	return q;
 }
 
-void detectMarker(std::vector< int >& markerIds, cv::Mat& inputImage, std::vector< std::vector<cv::Point2f> >& markerCorners) {
-	
-	std::vector< std::vector<cv::Point2f> >  rejectedCandidates;
-	//cv::aruco::DetectorParameters parameters = cv::aruco::DetectorParameters().create();
-	cv::Ptr < cv::aruco::DetectorParameters> parameters = new cv::aruco::DetectorParameters();
-	cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);
-	cv::aruco::detectMarkers(inputImage, dictionary, markerCorners, markerIds, parameters, rejectedCandidates);
-	if (markerIds.size() > 0)
-		cv::aruco::drawDetectedMarkers(inputImage, markerCorners, markerIds);
+void checkMachineId(std::vector< int > markerIds, std::vector< cv::Vec3d > rvecs, std::vector< cv::Vec3d > tvecs) {
+	for (int i = 0; i < markerIds.size(); i++) {
+		if ((markerIds[i] == 1) || (markerIds[i] == 4)) {
+			uint16_t targetId = i / 3;
+			cv::Vec4d q = toQuaternion(rvecs[i]);
+			targets.push_back(target(machineId, targetId,
+				tvecs[i][0], tvecs[i][1], tvecs[i][2],
+				q[0], q[1], q[2], q[3]));
+		}
+	}
+	std::cout << targets.size();
 }
 
 void videoDetect() {
 	cv::VideoCapture inputVideo;
-	inputVideo.open(1);
+	inputVideo.open(videoFeed);
 	int waitTime = 1;
 	while (inputVideo.grab()) {
 		cv::Mat image, imageCopy;
 		inputVideo.retrieve(image);
 		image.copyTo(imageCopy);
+
+		targets.clear();
 
 		std::vector< std::vector<cv::Point2f> > markerCorners;
 		std::vector< int > markerIds;
@@ -52,6 +68,8 @@ void videoDetect() {
 		for (int i = 0; i < markerIds.size(); i++)
 			cv::aruco::drawAxis(imageCopy, cameraMatrix, distCoeffs, rvecs[i], tvecs[i], 0.1);
 
+		checkMachineId(markerIds, rvecs, tvecs);
+
 		cv::imshow("out", imageCopy);
 		char key = (char)cv::waitKey(waitTime);
 		if (key == 27)
@@ -59,34 +77,23 @@ void videoDetect() {
 	}
 }
 
+//void init(target t) {
+//	// at most two targets for each packets
+//	targets.push_back(t);
+//	targets.push_back(t);
+//}
 
-int loadCameraParameters() {
-	const std::string inputSettingsFile = "out_camera_data.xml";
-	cv::FileStorage fs(inputSettingsFile, cv::FileStorage::READ); // Read the settings
-	if (!fs.isOpened())
-	{
-		std::cout << "Could not open the configuration file: \"" << inputSettingsFile << "\"\n";
-		return -1;
-	}
+int main(int argc, char **argv) {
+	// first argument: the machine/cam id in the whole configuration
+	// second argument: the camera id of the running machine, default is 0 for backpack
+	if(argc >= 1)
+		machineId = atoi(argv[1]);
+	if (argc >= 2)
+		videoFeed = atoi(argv[2]);
 
-	//cv::Mat cameraMatrix, distCoeffs;
+	//init(t);
 
-	fs["camera_matrix"] >> cameraMatrix;
-	fs["distortion_coefficients"] >> distCoeffs;
-	int width;
-	fs["image_width"] >> width;
-	std::cout << "camera_matrix:" << cameraMatrix << "\n";
-	std::cout << "distortion_coefficients:" << distCoeffs << "\n";
-	std::cout << "width:" << width << "\n";
-	fs.release();
-}
-
-
-int main() {
-	/*for(int i = 0; i < 250; i++)
-		createMarker(i);*/
-
-	loadCameraParameters();
+	loadCameraParameters(cameraMatrix, distCoeffs);
 
 	videoDetect();
 
