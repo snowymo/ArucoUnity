@@ -69,12 +69,16 @@ int initSender(sender &s) {
 
   s.devlen = sizeof(s.dev0);
 
+  printf("Sender initialized with socket %d\n", s.sock);
+
   return 0;
 }
 
 int cleanupSender(const sender &s) {
   closesocket(s.sock);
   WSACleanup();
+
+  printf("Sender cleaned up");
 
   return 0;
 }
