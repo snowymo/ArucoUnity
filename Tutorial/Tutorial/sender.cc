@@ -80,7 +80,7 @@ int cleanupSender(const sender &s) {
   closesocket(s.sock);
   WSACleanup();
 
-  printf("Sender cleaned up");
+  printf("Sender cleaned up\n");
 
   return 0;
 }
