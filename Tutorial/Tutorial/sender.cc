@@ -57,17 +57,19 @@ int initSender(sender &s) {
     return 1;
   }
 
-  memset((char*)&s.dev0, 0, sizeof(s.dev0));
+  s.devlen = sizeof(s.dev0);
+
+  memset((char*)&s.dev0, 0, s.devlen);
+
   s.dev0.sin_family = AF_INET;
   s.dev0.sin_port = htons(PORT);
   s.dev0.sin_addr.S_un.S_addr = inet_addr(DEV_ADDR_0);
 
-  memset((char*)&s.dev1, 0, sizeof(s.dev1));
+  memset((char*)&s.dev1, 0, s.devlen);
+
   s.dev1.sin_family = AF_INET;
   s.dev1.sin_port = htons(PORT);
   s.dev1.sin_addr.S_un.S_addr = inet_addr(DEV_ADDR_1);
-
-  s.devlen = sizeof(s.dev0);
 
   printf("Sender initialized with socket %d\n", s.sock);
 
