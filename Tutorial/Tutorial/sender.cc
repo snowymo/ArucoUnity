@@ -42,7 +42,7 @@ int deserialize(char *buf, target &data) {
 
 int initSender(sender &s) {
   if (WSAStartup(MAKEWORD(2, 2), &s.wsa) != 0) {
-    printf("Error during init: %d\n", WSAGetLastError());
+    WSAERR("Error during init");
     return 1;
   }
 
@@ -53,7 +53,7 @@ int initSender(sender &s) {
   );
 
   if (s.sock == SOCKET_ERROR) {
-    printf("Socket error: %d\n", WSAGetLastError());
+    WSAERR("Socket error");
     return 1;
   }
 
@@ -105,7 +105,7 @@ int sendData(const sender &s, const target &data) {
   );
 
   if (err == SOCKET_ERROR) {
-    printf("Error during send: %d\n", WSAGetLastError());
+    WSAERR("Error during send");
     return 1;
   }
 
@@ -119,7 +119,7 @@ int sendData(const sender &s, const target &data) {
   );
 
   if (err == SOCKET_ERROR) {
-    printf("Error during send: %d\n", WSAGetLastError());
+    WSAERR("Error during send");
     return 1;
   }
 

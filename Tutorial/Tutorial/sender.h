@@ -10,6 +10,8 @@
 #define DEV_ADDR_1 "192.168.1.78"
 #define PORT 9591
 
+#define WSAERR(msg) printf(msg ": %d\n", WSAGetLastError())
+
 struct target {
   static const size_t SIZE
     = 2 * sizeof(uint16_t)
