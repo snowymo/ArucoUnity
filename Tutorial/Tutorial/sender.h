@@ -4,7 +4,13 @@
 #include <cstdint>
 #include <stddef.h>
 #include <stdio.h>
-#include <winsock2.h>
+
+#ifndef _WIN32
+# include "stubs.h"
+# include <string.h>
+#else
+# include <winsock2.h>
+#endif
 
 #define DEV_ADDR_0 "192.168.1.77"
 #define DEV_ADDR_1 "192.168.1.78"
