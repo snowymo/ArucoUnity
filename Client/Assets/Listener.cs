@@ -17,7 +17,7 @@ public class Listener {
   byte[] buffer;
 
   Thread thread;
-  bool running;
+  volatile bool running;
   object sync;
   Target lastValidData;
 
@@ -97,5 +97,6 @@ public class Listener {
 
   public void Stop() {
     running = false;
+    thread.Join();
   }
 }
