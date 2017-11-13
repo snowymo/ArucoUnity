@@ -1,10 +1,13 @@
 #ifndef STUBS_H
 #define STUBS_H
 
+#define SOCKET int
+
 #define SOCKET_ERROR -1
 #define AF_INET       0
 #define SOCK_DGRAM    0
 #define IPPROTO_UDP   0
+#define INADDR_ANY    0
 
 #define MAKEWORD(a, b) 0
 
@@ -16,6 +19,7 @@
 #define htons(p)     0
 
 #define socket(a, b, c)                0
+#define bind(a, b, c)                  0
 #define sendto(s, buf, len, o, out, l) 0
 #define closesocket(s)                 ;
 
@@ -43,6 +47,8 @@ struct in_addr {
     ulong S_addr;
 
   } S_un;
+
+  ulong s_addr;
 };
 
 struct sockaddr_in {
