@@ -8,5 +8,6 @@ public class Client : MonoBehaviour {
 
   void Awake() {
     listener = new Listener(port);
+    listener.Start();
   }
 }
