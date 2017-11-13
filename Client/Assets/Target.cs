@@ -25,7 +25,7 @@ public struct Target {
     target.cam_id = BitConverter.ToUInt16(buffer, index);
     index += sizeof(ushort);
 
-    target.cam_id = BitConverter.ToUInt16(buffer, index);
+    target.target_id = BitConverter.ToUInt16(buffer, index);
     index += sizeof(ushort);
 
     /* Position */
