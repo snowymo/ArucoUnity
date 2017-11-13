@@ -48,6 +48,9 @@ public struct Target {
     index += sizeof(double);
 
     target.rot_z = BitConverter.ToDouble(buffer, index);
+    index += sizeof(double);
+
+    target.rot_w = BitConverter.ToDouble(buffer, index);
 
     return target;
   }
