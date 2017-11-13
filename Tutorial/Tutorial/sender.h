@@ -12,6 +12,8 @@
 # include <winsock2.h>
 #endif
 
+#pragma comment(lib, "Ws2_32.lib")
+
 #define DEV_ADDR_0 "192.168.1.77"
 #define DEV_ADDR_1 "192.168.1.78"
 #define DEV_PORT  9591
@@ -35,6 +37,9 @@ struct target {
   double rot_y;
   double rot_z;
   double rot_w;
+
+  target() {}
+  target(uint16_t c, uint16_t t, double x, double y, double z, double rx, double ry, double rz, double rw);
 };
 
 int serialize(const target &data, char *buf);

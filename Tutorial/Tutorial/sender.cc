@@ -1,5 +1,12 @@
 #include "sender.h"
 
+target::target(uint16_t c, uint16_t t, double x, double y, double z, double rx, double ry, double rz, double rw)
+	: cam_id(c), target_id(t), pos_x(x), pos_y(y), pos_z(z), rot_x(rx), rot_y(ry), rot_z(rz), rot_w(rw)
+{
+
+}
+
+
 int serialize(const target &data, char *buf) {
   uint16_t *ids = (uint16_t*)buf;
 
@@ -45,7 +52,7 @@ int initSender(sender &s) {
     WSAERR("Error during init");
     return 1;
   }
-
+ 
   s.sock = socket(
     AF_INET,
     SOCK_DGRAM,

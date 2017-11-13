@@ -1,3 +1,4 @@
+#include "sender.h"
 #include "opencv_helper.h"
 
 #include <vector>
@@ -5,13 +6,14 @@
 #include <string>
 #include <iostream>
 
-#include "target.h"
+
 
 cv::Mat cameraMatrix, distCoeffs;
 
 std::vector<target> targets;
 int machineId = 0;
 int videoFeed = 1;
+sender s;
 
 cv::Vec4d toQuaternion(cv::Vec3d rvec)
 {
@@ -45,6 +47,15 @@ void checkMachineId(std::vector< int > markerIds, std::vector< cv::Vec3d > rvecs
 		}
 	}
 	std::cout << targets.size();
+}
+
+void sendTargets() {
+	
+
+	for(int i = 0; i < targets.size(); i++)
+		sendData(s, targets[i]);
+
+	cleanupSender(s);
 }
 
 void videoDetect() {
@@ -91,13 +102,15 @@ int main(int argc, char **argv) {
 	if (argc >= 2)
 		videoFeed = atoi(argv[2]);
 
+	s = sender();
+	initSender(s);
 	//init(t);
 
 	loadCameraParameters(cameraMatrix, distCoeffs);
 
 	videoDetect();
 
-	
+	cleanupSender(s);
 	
 	return 0;
 }
