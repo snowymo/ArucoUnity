@@ -1,12 +1,14 @@
 using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using UnityEngine;
 
 public class Listener {
 
   Socket sock = null;
   IPEndPoint end = null;
+  Thread thread;
 
   public Listener(short port) {
     /* Create */
@@ -44,6 +46,12 @@ public class Listener {
     }
 
     Debug.Log("Bound socket to " + end);
+
+    thread = new Thread(new ThreadStart(Run));
+  }
+
+  public void Start() {
+    thread.Start();
   }
 
   void Run() {
