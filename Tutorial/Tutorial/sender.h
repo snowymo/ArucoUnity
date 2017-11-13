@@ -14,7 +14,8 @@
 
 #define DEV_ADDR_0 "192.168.1.77"
 #define DEV_ADDR_1 "192.168.1.78"
-#define PORT 9591
+#define DEV_PORT  9591
+#define HOST_PORT 9592
 
 #define WSAERR(msg) printf(msg ": %d\n", WSAGetLastError())
 
