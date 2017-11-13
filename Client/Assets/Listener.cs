@@ -47,14 +47,22 @@ public class Listener {
 
     Debug.Log("Bound socket to " + end);
 
-    thread = new Thread(new ThreadStart(Run));
+    /* Listen */
+
+    var start = new ThreadStart(
+      () => {
+        while (true) Update();
+      }
+    );
+
+    thread = new Thread(start);
   }
 
   public void Start() {
     thread.Start();
   }
 
-  void Run() {
+  void Update() {
     byte[] buffer = new byte[Target.SIZE];
 
     try {
