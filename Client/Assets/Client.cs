@@ -60,5 +60,7 @@ public class Client : MonoBehaviour {
     }
 
     Target target = Target.Deserialize(buffer);
+
+    Debug.Log(target);
   }
 }
