@@ -40,9 +40,9 @@ int serialize(const target &data, char *buf);
 int deserialize(char *buf, target &data);
 
 struct sender {
-  sockaddr_in dev0, dev1;
+  sockaddr_in host, dev0, dev1;
   WSADATA wsa;
-  int sock;
+  SOCKET sock;
   size_t devlen;
 };
 
