@@ -7,7 +7,9 @@ using UnityEngine;
 public class Listener {
 
   public Target Out {
-    get { return lastValidData; }
+    get {
+      lock (sync) { return lastValidData; }
+    }
   }
 
   Socket sock = null;
