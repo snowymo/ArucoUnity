@@ -39,6 +39,7 @@ struct target {
   double rot_w;
 
   target() {}
+  target(uint16_t c, uint16_t t);
   target(uint16_t c, uint16_t t, double x, double y, double z, double rx, double ry, double rz, double rw);
 };
 

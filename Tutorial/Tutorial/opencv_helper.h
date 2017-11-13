@@ -11,4 +11,6 @@ void detectMarker(std::vector< int >& markerIds, cv::Mat& inputImage, std::vecto
 
 void createMarker(int markerid = 0);
 
+cv::Vec4d toQuaternion(cv::Vec3d rvec);
+
 #endif

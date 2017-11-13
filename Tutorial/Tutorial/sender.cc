@@ -1,5 +1,9 @@
 #include "sender.h"
 
+target::target(uint16_t c, uint16_t t) : cam_id(c), target_id(t)
+{
+}
+
 target::target(uint16_t c, uint16_t t, double x, double y, double z, double rx, double ry, double rz, double rw)
 	: cam_id(c), target_id(t), pos_x(x), pos_y(y), pos_z(z), rot_x(rx), rot_y(ry), rot_z(rz), rot_w(rw)
 {

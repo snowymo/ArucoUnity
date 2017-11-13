@@ -15,26 +15,9 @@ int machineId = 0;
 int videoFeed = 1;
 sender s;
 
-cv::Vec4d toQuaternion(cv::Vec3d rvec)
-{
-	cv::Vec4d q;
-	double pitch = rvec[0];
-	double roll = rvec[1];
-	double yaw = rvec[2];
-	// Abbreviations for the various angular functions
-	double cy = cos(yaw * 0.5);
-	double sy = sin(yaw * 0.5);
-	double cr = cos(roll * 0.5);
-	double sr = sin(roll * 0.5);
-	double cp = cos(pitch * 0.5);
-	double sp = sin(pitch * 0.5);
 
-	q[0] = cy * cr * cp + sy * sr * sp;
-	q[1] = cy * sr * cp - sy * cr * sp;
-	q[2] = cy * cr * sp + sy * sr * cp;
-	q[3] = sy * cr * cp - cy * sr * sp;
-	return q;
-}
+
+
 
 void checkMachineId(std::vector< int > markerIds, std::vector< cv::Vec3d > rvecs, std::vector< cv::Vec3d > tvecs) {
 	for (int i = 0; i < markerIds.size(); i++) {
