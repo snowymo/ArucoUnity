@@ -1,6 +1,5 @@
 Tutorial/Tutorial/x64/Debug/*
 
-
 */*.opendb
 */*.VC.db
 
@@ -8,3 +7,41 @@ Tutorial/Tutorial/x64/Debug/*
 
 */x64/*/*.ilk
 */x64/*/*.pdb
+
+out
+
+Temp/
+Library/
+Library.meta
+tmp/
+tmp.meta
+Builds/
+
+ExportedObj/
+obj/
+*.svd
+*.userprefs
+/*.csproj
+*.pidb
+*.suo
+/*.sln
+*.user
+*.unityproj
+*.booproj
+*.sln
+*.csproj
+*.unitypackage
+*.apk
+*.swp
+
+*.pidb.meta
+.#*
+sysinfo.txt
+
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
