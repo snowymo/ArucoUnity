@@ -18,34 +18,37 @@ public struct Target {
   public double rot_z;
   public double rot_w;
 
-  public void Deserialize(byte[] buffer) {
+  public static Target Deserialize(byte[] buffer) {
+    Target target = new Target();
     int index = 0;
 
-    this.cam_id = BitConverter.ToUInt16(buffer, index);
+    target.cam_id = BitConverter.ToUInt16(buffer, index);
     index += sizeof(ushort);
 
-    this.cam_id = BitConverter.ToUInt16(buffer, index);
+    target.cam_id = BitConverter.ToUInt16(buffer, index);
     index += sizeof(ushort);
 
     /* Position */
 
-    this.pos_x = BitConverter.ToDouble(buffer, index);
+    target.pos_x = BitConverter.ToDouble(buffer, index);
     index += sizeof(double);
 
-    this.pos_y = BitConverter.ToDouble(buffer, index);
+    target.pos_y = BitConverter.ToDouble(buffer, index);
     index += sizeof(double);
 
-    this.pos_z = BitConverter.ToDouble(buffer, index);
+    target.pos_z = BitConverter.ToDouble(buffer, index);
     index += sizeof(double);
 
     /* Rotation */
 
-    this.rot_x = BitConverter.ToDouble(buffer, index);
+    target.rot_x = BitConverter.ToDouble(buffer, index);
     index += sizeof(double);
 
-    this.rot_y = BitConverter.ToDouble(buffer, index);
+    target.rot_y = BitConverter.ToDouble(buffer, index);
     index += sizeof(double);
 
-    this.rot_z = BitConverter.ToDouble(buffer, index);
+    target.rot_z = BitConverter.ToDouble(buffer, index);
+
+    return target;
   }
 }
