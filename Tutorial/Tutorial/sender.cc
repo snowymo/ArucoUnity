@@ -57,18 +57,34 @@ int initSender(sender &s) {
     return 1;
   }
 
+  s.host.sin_family = AF_INET;
+  s.host.sin_port = htons(HOST_PORT);
+  s.host.sin_addr.s_addr = INADDR_ANY;
+
+  int err;
+
+  err = bind(
+    s.sock,
+    (sockaddr*)&s.host,
+    sizeof(s.host)
+  );
+
+  if (err == SOCKET_ERROR) {
+    WSAERR("Bind error");
+  }
+
   s.devlen = sizeof(s.dev0);
 
   memset((char*)&s.dev0, 0, s.devlen);
 
   s.dev0.sin_family = AF_INET;
-  s.dev0.sin_port = htons(PORT);
+  s.dev0.sin_port = htons(DEV_PORT);
   s.dev0.sin_addr.S_un.S_addr = inet_addr(DEV_ADDR_0);
 
   memset((char*)&s.dev1, 0, s.devlen);
 
   s.dev1.sin_family = AF_INET;
-  s.dev1.sin_port = htons(PORT);
+  s.dev1.sin_port = htons(DEV_PORT);
   s.dev1.sin_addr.S_un.S_addr = inet_addr(DEV_ADDR_1);
 
   printf("Sender initialized with socket %d\n", s.sock);
