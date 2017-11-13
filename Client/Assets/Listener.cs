@@ -8,6 +8,7 @@ public class Listener {
 
   Socket sock = null;
   IPEndPoint end = null;
+  byte[] buffer;
   Thread thread;
 
   public Listener(short port) {
@@ -49,6 +50,8 @@ public class Listener {
 
     /* Listen */
 
+    buffer = new byte[Target.SIZE];
+
     var start = new ThreadStart(
       () => {
         while (true) Update();
@@ -63,8 +66,6 @@ public class Listener {
   }
 
   void Update() {
-    byte[] buffer = new byte[Target.SIZE];
-
     try {
       // Get buffer (blocking)
       if (sock.Receive(buffer) == 0) return;
