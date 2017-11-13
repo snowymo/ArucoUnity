@@ -14,8 +14,8 @@ target::target(uint16_t c, uint16_t t, double x, double y, double z, double rx, 
 int serialize(const target &data, char *buf) {
   uint16_t *ids = (uint16_t*)buf;
 
-  *ids = data.cam_id;    ids++;
-  *ids = data.target_id; ids++;
+  *ids = htons(data.cam_id);    ids++;
+  *ids = htons(data.target_id); ids++;
 
   double *tra = (double*)ids;
 
@@ -34,8 +34,8 @@ int serialize(const target &data, char *buf) {
 int deserialize(char *buf, target &data) {
   uint16_t *ids = (uint16_t*)buf;
 
-  data.cam_id = *ids;    ids++;
-  data.target_id = *ids; ids++;
+  data.cam_id = nstoh(*ids);    ids++;
+  data.target_id = nstoh(*ids); ids++;
 
   double *tra = (double*)ids;
 
