@@ -9,6 +9,7 @@ Tutorial/Tutorial/x64/Debug/*
 */x64/*/*.pdb
 
 out
+out.exe
 
 Temp/
 Library/
