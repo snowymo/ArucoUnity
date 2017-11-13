@@ -49,13 +49,16 @@ public class Client : MonoBehaviour {
   }
 
   void Run() {
-    // Get buffer (blocking)
+    byte[] buffer = new byte[Target.SIZE];
+
     try {
-      var buffer = new byte[Target.SIZE];
+      // Get buffer (blocking)
       if (sock.Receive(buffer) == 0) return;
     } catch (Exception e) {
       Debug.LogWarning(e);
       return;
     }
+
+    Target target = Target.Deserialize(buffer);
   }
 }
