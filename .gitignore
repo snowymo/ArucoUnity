@@ -11,6 +11,9 @@ Tutorial/Tutorial/x64/Debug/*
 out
 out.exe
 
+Scenes.meta
+Scripts.meta
+
 Temp/
 Library/
 Library.meta
