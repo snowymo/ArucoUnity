@@ -6,17 +6,17 @@ public struct Target {
     = 2 * sizeof(ushort)
     + 7 * sizeof(double);
 
-  ushort cam_id;
-  ushort target_id;
+  public ushort cam_id;
+  public ushort target_id;
 
-  double pos_x;
-  double pos_y;
-  double pos_z;
+  public double pos_x;
+  public double pos_y;
+  public double pos_z;
 
-  double rot_x;
-  double rot_y;
-  double rot_z;
-  double rot_w;
+  public double rot_x;
+  public double rot_y;
+  public double rot_z;
+  public double rot_w;
 
   public void Deserialize(byte[] buffer) {
     int index = 0;
