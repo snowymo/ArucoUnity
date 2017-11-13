@@ -15,4 +15,8 @@ public class Client : MonoBehaviour {
     Target target = listener.Out;
     Debug.Log(target);
   }
+
+  void OnDestroy() {
+    listener.Stop();
+  }
 }
