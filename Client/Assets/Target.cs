@@ -1,4 +1,5 @@
 using System;
+using System.Net;
 
 public struct Target {
 
@@ -22,10 +23,16 @@ public struct Target {
     Target target = new Target();
     int index = 0;
 
-    target.cam_id = BitConverter.ToUInt16(buffer, index);
+    target.cam_id = (ushort)IPAddress.NetworkToHostOrder(
+      BitConverter.ToUInt16(buffer, index)
+    );
+
     index += sizeof(ushort);
 
-    target.target_id = BitConverter.ToUInt16(buffer, index);
+    target.target_id = (ushort)IPAddress.NetworkToHostOrder(
+      BitConverter.ToUInt16(buffer, index)
+    );
+
     index += sizeof(ushort);
 
     /* Position */
