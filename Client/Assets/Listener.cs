@@ -6,6 +6,8 @@ using UnityEngine;
 
 public class Listener {
 
+  const int TIMEOUT = 1000; // ms
+
   public Target Out {
     get {
       lock (sync) { return lastValidData; }
@@ -34,6 +36,8 @@ public class Listener {
       Debug.LogWarning(e);
       return;
     }
+
+    sock.ReceiveTimeout = TIMEOUT;
 
     Debug.Log("Created socket with handle " + sock.Handle);
 
@@ -86,6 +90,10 @@ public class Listener {
     try {
       // Get buffer (blocking)
       if (sock.Receive(buffer) == 0) return;
+    } catch (SocketException e) {
+      if (e.ErrorCode == 10035 || e.ErrorCode == 10060) {
+        Debug.LogWarning("Listener timeout: " + e);
+      }
     } catch (Exception e) {
       Debug.LogWarning(e);
       return;
