@@ -10,4 +10,9 @@ public class Client : MonoBehaviour {
     listener = new Listener(port);
     listener.Start();
   }
+
+  void Update() {
+    Target target = listener.Out;
+    Debug.Log(target);
+  }
 }
