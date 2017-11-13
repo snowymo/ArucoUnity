@@ -6,10 +6,17 @@ using UnityEngine;
 
 public class Listener {
 
+  public Target Out {
+    get { return lastValidData; }
+  }
+
   Socket sock = null;
   IPEndPoint end = null;
   byte[] buffer;
+
   Thread thread;
+  static object sync;
+  Target lastValidData;
 
   public Listener(short port) {
     /* Create */
@@ -51,6 +58,7 @@ public class Listener {
     /* Listen */
 
     buffer = new byte[Target.SIZE];
+    sync = new object();
 
     var start = new ThreadStart(
       () => {
@@ -75,7 +83,6 @@ public class Listener {
     }
 
     Target target = Target.Deserialize(buffer);
-
-    Debug.Log(target);
+    lock(sync) { lastValidData = target; }
   }
 }
