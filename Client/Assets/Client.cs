@@ -47,4 +47,15 @@ public class Client : MonoBehaviour {
 
     Debug.Log("Bound socket to " + end);
   }
+
+  void Run() {
+    // Get buffer (blocking)
+    try {
+      var buffer = new byte[Target.SIZE];
+      if (sock.Receive(buffer) == 0) return;
+    } catch (Exception e) {
+      Debug.LogWarning(e);
+      return;
+    }
+  }
 }
