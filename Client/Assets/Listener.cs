@@ -17,6 +17,7 @@ public class Listener {
   byte[] buffer;
 
   Thread thread;
+  bool running;
   object sync;
   Target lastValidData;
 
@@ -60,11 +61,14 @@ public class Listener {
     /* Listen */
 
     buffer = new byte[Target.SIZE];
+    running = false;
     sync = new object();
 
     var start = new ThreadStart(
       () => {
-        while (true) Update();
+        Debug.Log("Listener thread started");
+        while (running) Update();
+        Debug.Log("Listener thread stopped");
       }
     );
 
@@ -72,6 +76,9 @@ public class Listener {
   }
 
   public void Start() {
+    if (running) return;
+    running = true;
+
     thread.Start();
   }
 
@@ -86,5 +93,9 @@ public class Listener {
 
     Target target = Target.Deserialize(buffer);
     lock(sync) { lastValidData = target; }
+  }
+
+  public void Stop() {
+    running = false;
   }
 }
