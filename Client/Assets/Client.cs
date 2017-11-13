@@ -18,5 +18,6 @@ public class Client : MonoBehaviour {
 
   void OnDestroy() {
     listener.Stop();
+    listener.Cleanup();
   }
 }
