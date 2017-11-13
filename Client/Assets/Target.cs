@@ -1,6 +1,6 @@
 public struct Target {
 
-  const int SIZE
+  public const int SIZE
     = 2 * sizeof(ushort)
     + 7 * sizeof(double);
 
