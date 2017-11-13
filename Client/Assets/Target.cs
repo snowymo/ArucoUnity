@@ -51,4 +51,16 @@ public struct Target {
 
     return target;
   }
+
+  public override string ToString() {
+    return "cam_" + this.cam_id
+      + " target_" + this.target_id
+      + " pos (" + this.pos_x
+      + ", " + this.pos_y
+      + ", " + this.pos_z
+      + ") rot (" + this.rot_x
+      + ", " + this.rot_y
+      + ", " + this.rot_z
+      + ", " + this.rot_w + ")";
+  }
 }
