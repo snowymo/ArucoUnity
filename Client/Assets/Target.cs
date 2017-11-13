@@ -24,13 +24,13 @@ public struct Target {
     int index = 0;
 
     target.cam_id = (ushort)IPAddress.NetworkToHostOrder(
-      BitConverter.ToUInt16(buffer, index)
+      BitConverter.ToInt16(buffer, index)
     );
 
     index += sizeof(ushort);
 
     target.target_id = (ushort)IPAddress.NetworkToHostOrder(
-      BitConverter.ToUInt16(buffer, index)
+      BitConverter.ToInt16(buffer, index)
     );
 
     index += sizeof(ushort);
