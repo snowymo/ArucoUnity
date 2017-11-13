@@ -107,4 +107,8 @@ public class Listener {
     running = false;
     thread.Join();
   }
+
+  public void Cleanup() {
+    sock.Close();
+  }
 }
