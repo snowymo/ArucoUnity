@@ -16,7 +16,8 @@
 #define WSACleanup()      ;
 
 #define inet_addr(s) 0
-#define htons(p)     0
+#define htons(s)     s
+#define nstoh(s)     s
 
 #define socket(a, b, c)                0
 #define bind(a, b, c)                  0
