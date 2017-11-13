@@ -15,7 +15,7 @@ public class Listener {
   byte[] buffer;
 
   Thread thread;
-  static object sync;
+  object sync;
   Target lastValidData;
 
   public Listener(short port) {
