@@ -5,7 +5,10 @@ int main() {
   initSender(s);
 
   target t = target();
-  sendData(s, t);
+
+  while (true) {
+    sendData(s, t);
+  }
 
   cleanupSender(s);
 
