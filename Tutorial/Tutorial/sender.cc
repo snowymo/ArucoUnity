@@ -34,8 +34,8 @@ int serialize(const target &data, char *buf) {
 int deserialize(char *buf, target &data) {
   uint16_t *ids = (uint16_t*)buf;
 
-  data.cam_id = nstoh(*ids);    ids++;
-  data.target_id = nstoh(*ids); ids++;
+  data.cam_id = ntohs(*ids);    ids++;
+  data.target_id = ntohs(*ids); ids++;
 
   double *tra = (double*)ids;
 
