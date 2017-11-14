@@ -2,17 +2,12 @@ using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Listener {
 
   const int TIMEOUT = 1000; // ms
-
-  public Target Out {
-    get {
-      lock (sync) { return lastValidData; }
-    }
-  }
 
   Socket sock = null;
   IPEndPoint end = null;
@@ -21,7 +16,8 @@ public class Listener {
   Thread thread;
   volatile bool running;
   object sync;
-  Target lastValidData;
+
+  Dictionary<KeyValuePair<int, int>, Target> data;
 
   public Listener(short port) {
     /* Create */
@@ -67,6 +63,7 @@ public class Listener {
     buffer = new byte[Target.SIZE];
     running = false;
     sync = new object();
+    data = new Dictionary<KeyValuePair<int, int>, Target>();
 
     var start = new ThreadStart(
       () => {
@@ -77,6 +74,12 @@ public class Listener {
     );
 
     thread = new Thread(start);
+  }
+
+  public Target GetTarget(KeyValuePair<int, int> pair) {
+    Target target = new Target();
+    lock(sync) { data.TryGetValue(pair, out target); }
+    return target;
   }
 
   public void Start() {
@@ -100,7 +103,8 @@ public class Listener {
     }
 
     Target target = Target.Deserialize(buffer);
-    lock(sync) { lastValidData = target; }
+    var pair = new KeyValuePair<int, int>(target.cam_id, target.target_id);
+    lock(sync) { data[pair] = target; }
   }
 
   public void Stop() {
