@@ -5,8 +5,8 @@
 #include <stdlib.h>
 #include <string>
 #include <iostream>
-
-
+#include <chrono>
+using namespace std::chrono;
 
 cv::Mat cameraMatrix, distCoeffs;
 
@@ -16,7 +16,7 @@ int videoFeed = 1;
 sender s;
 std::string inputSettingsFile = "out_camera_data.xml";
 
-
+milliseconds ms, ms2;
 
 
 void checkMachineId(std::vector< int > markerIds, std::vector< cv::Vec3d > rvecs, std::vector< cv::Vec3d > tvecs) {
@@ -33,12 +33,8 @@ void checkMachineId(std::vector< int > markerIds, std::vector< cv::Vec3d > rvecs
 }
 
 void sendTargets() {
-	
-
 	for(int i = 0; i < targets.size(); i++)
 		sendData(s, targets[i]);
-
-	cleanupSender(s);
 }
 
 void videoDetect() {
@@ -46,12 +42,15 @@ void videoDetect() {
 	inputVideo.open(videoFeed);
 	int waitTime = 1;
 	while (inputVideo.grab()) {
+		ms = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
 		cv::Mat image, imageCopy;
 		inputVideo.retrieve(image);
 		image.copyTo(imageCopy);
-
+		ms2 = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
+		std::cout << "retrieve image and copy:\t" << (ms2 - ms).count() << "\tms\n";
 		targets.clear();
 
+		ms = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
 		std::vector< std::vector<cv::Point2f> > markerCorners;
 		std::vector< int > markerIds;
 		detectMarker(markerIds, imageCopy, markerCorners);
@@ -59,11 +58,17 @@ void videoDetect() {
 		std::vector< cv::Vec3d > rvecs, tvecs;
 		cv::aruco::estimatePoseSingleMarkers(markerCorners, 0.05, cameraMatrix, distCoeffs, rvecs, tvecs);
 
+		ms2 = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
+		std::cout << "detect and find pos and quaternion:\t" << (ms2 - ms).count() << "\tms\n";
+
 		for (int i = 0; i < markerIds.size(); i++)
 			cv::aruco::drawAxis(imageCopy, cameraMatrix, distCoeffs, rvecs[i], tvecs[i], 0.1);
 
+		ms = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
 		checkMachineId(markerIds, rvecs, tvecs);
-
+		sendTargets();
+		ms2 = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
+		std::cout << "check the corresponding marker id and send:\t" << (ms2 - ms).count() << "\tms\n";
 		cv::imshow("out", imageCopy);
 		char key = (char)cv::waitKey(waitTime);
 		if (key == 27)
@@ -80,11 +85,11 @@ void videoDetect() {
 int main(int argc, char **argv) {
 	// first argument: the machine/cam id in the whole configuration
 	// second argument: the camera id of the running machine, default is 0 for backpack
-	if(argc >= 1)
+	if(argc > 1)
 		machineId = atoi(argv[1]);
-	if (argc >= 2)
+	if (argc > 2)
 		videoFeed = atoi(argv[2]);
-	if (argc >= 3)
+	if (argc > 3)
 		inputSettingsFile = argv[3];
 	s = sender();
 	initSender(s);
