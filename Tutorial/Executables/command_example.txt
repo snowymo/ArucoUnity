@@ -1,0 +1,4 @@
+Tutorial.exe 0 1 out_camera_data_122_fisheye.xml
+0 means the id of this machine to the whole system
+1 means the device id of this camera to current computer
+*.xml is the calibration file for this camera

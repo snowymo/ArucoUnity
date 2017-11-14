@@ -45,8 +45,7 @@ void detectMarker(std::vector< int >& markerIds, cv::Mat& inputImage, std::vecto
 		cv::aruco::drawDetectedMarkers(inputImage, markerCorners, markerIds);
 }
 
-int loadCameraParameters(cv::Mat& cameraMatrix, cv::Mat& distCoeffs) {
-	const std::string inputSettingsFile = "out_camera_data.xml";
+int loadCameraParameters(cv::Mat& cameraMatrix, cv::Mat& distCoeffs, std::string inputSettingsFile) {
 	cv::FileStorage fs(inputSettingsFile, cv::FileStorage::READ); // Read the settings
 	if (!fs.isOpened())
 	{

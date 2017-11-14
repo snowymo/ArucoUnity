@@ -5,7 +5,7 @@
 #include <opencv2/core.hpp>
 #include <opencv2/opencv.hpp>
 
-int loadCameraParameters(cv::Mat& cameraMatrix, cv::Mat& distCoeffs);
+int loadCameraParameters(cv::Mat& cameraMatrix, cv::Mat& distCoeffs, std::string inputSettingsFile);
 
 void detectMarker(std::vector< int >& markerIds, cv::Mat& inputImage, std::vector< std::vector<cv::Point2f> >& markerCorners);
 

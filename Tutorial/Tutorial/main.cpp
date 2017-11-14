@@ -14,7 +14,7 @@ std::vector<target> targets;
 int machineId = 0;
 int videoFeed = 1;
 sender s;
-
+std::string inputSettingsFile = "out_camera_data.xml";
 
 
 
@@ -84,12 +84,13 @@ int main(int argc, char **argv) {
 		machineId = atoi(argv[1]);
 	if (argc >= 2)
 		videoFeed = atoi(argv[2]);
-
+	if (argc >= 3)
+		inputSettingsFile = argv[3];
 	s = sender();
 	initSender(s);
 	//init(t);
 
-	loadCameraParameters(cameraMatrix, distCoeffs);
+	loadCameraParameters(cameraMatrix, distCoeffs, inputSettingsFile);
 
 	videoDetect();
 
