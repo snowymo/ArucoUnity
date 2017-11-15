@@ -14,6 +14,7 @@ public class TrackedObject : MonoBehaviour {
   Holojam.Utility.AdaptiveSmoother smoother
     = new Holojam.Utility.AdaptiveSmoother();
   Vector3 lastPosition;
+  Quaternion lastRotation;
 
   void Update() {
     // Get target from listener with camera and target IDs
@@ -28,7 +29,11 @@ public class TrackedObject : MonoBehaviour {
       deltaTime
     );
 
-    transform.rotation = target.GetRotation();
+    transform.rotation = smoother.Smooth(
+      target.GetRotation(),
+      ref lastRotation,
+      deltaTime
+    );
 
     // Reset delta time if the data changed
     if (!target.Equals(lastTarget)) deltaTime = 0;
