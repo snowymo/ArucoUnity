@@ -1,5 +1,6 @@
 using System;
 using System.Net;
+using UnityEngine;
 
 public struct Target {
 
@@ -72,5 +73,22 @@ public struct Target {
       + ", " + this.rot_y
       + ", " + this.rot_z
       + ", " + this.rot_w + ")";
+  }
+
+  public Vector3 GetPosition() {
+    return new Vector3(
+      (float)this.pos_x,
+      (float)this.pos_y,
+      (float)this.pos_z
+    );
+  }
+
+  public Quaternion GetRotation() {
+    return new Quaternion(
+      (float)this.rot_x,
+      (float)this.rot_y,
+      (float)this.rot_z,
+      (float)this.rot_w
+    );
   }
 }
