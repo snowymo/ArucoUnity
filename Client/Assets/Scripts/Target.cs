@@ -75,20 +75,22 @@ public struct Target {
       + ", " + this.rot_w + ")";
   }
 
+  /* Convert to LHS */
+
   public Vector3 GetPosition() {
     return new Vector3(
-      (float)this.pos_x,
-      (float)this.pos_y,
-      (float)this.pos_z
+      -1 * (float)this.pos_x,
+           (float)this.pos_y,
+           (float)this.pos_z
     );
   }
 
   public Quaternion GetRotation() {
     return new Quaternion(
-      (float)this.rot_x,
-      (float)this.rot_y,
-      (float)this.rot_z,
-      (float)this.rot_w
+      -1 * (float)this.rot_x,
+           (float)this.rot_y,
+           (float)this.rot_z,
+      -1 * (float)this.rot_w
     );
   }
 }
