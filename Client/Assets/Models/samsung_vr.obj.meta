@@ -1,0 +1,184 @@
+fileFormatVersion: 2
+guid: b6c43846a9376fb4d9f8e23849f3ab5a
+timeCreated: 1510807636
+licenseType: Free
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: ChamferBox001
+    100002: ChamferBox002
+    100004: ChamferBox003
+    100006: ChamferCyl001
+    100008: Line001
+    100010: Line004
+    100012: Line005
+    100014: Object030
+    100016: Object031
+    100018: Object035
+    100020: Object036
+    100022: Object038
+    100024: Rectangle030
+    100026: //RootNode
+    100028: Sphere005
+    100030: Sphere006
+    100032: Tube003
+    100034: Tube004
+    100036: Tube005
+    100038: Tube006
+    100040: Tube007
+    100042: Tube008
+    400000: ChamferBox001
+    400002: ChamferBox002
+    400004: ChamferBox003
+    400006: ChamferCyl001
+    400008: Line001
+    400010: Line004
+    400012: Line005
+    400014: Object030
+    400016: Object031
+    400018: Object035
+    400020: Object036
+    400022: Object038
+    400024: Rectangle030
+    400026: //RootNode
+    400028: Sphere005
+    400030: Sphere006
+    400032: Tube003
+    400034: Tube004
+    400036: Tube005
+    400038: Tube006
+    400040: Tube007
+    400042: Tube008
+    2300000: ChamferBox001
+    2300002: ChamferBox002
+    2300004: ChamferBox003
+    2300006: ChamferCyl001
+    2300008: Line001
+    2300010: Line004
+    2300012: Line005
+    2300014: Object030
+    2300016: Object031
+    2300018: Object035
+    2300020: Object036
+    2300022: Object038
+    2300024: Rectangle030
+    2300026: Sphere005
+    2300028: Sphere006
+    2300030: Tube003
+    2300032: Tube004
+    2300034: Tube005
+    2300036: Tube006
+    2300038: Tube007
+    2300040: Tube008
+    3300000: ChamferBox001
+    3300002: ChamferBox002
+    3300004: ChamferBox003
+    3300006: ChamferCyl001
+    3300008: Line001
+    3300010: Line004
+    3300012: Line005
+    3300014: Object030
+    3300016: Object031
+    3300018: Object035
+    3300020: Object036
+    3300022: Object038
+    3300024: Rectangle030
+    3300026: Sphere005
+    3300028: Sphere006
+    3300030: Tube003
+    3300032: Tube004
+    3300034: Tube005
+    3300036: Tube006
+    3300038: Tube007
+    3300040: Tube008
+    4300000: ChamferBox001
+    4300002: ChamferBox002
+    4300004: ChamferBox003
+    4300006: ChamferCyl001
+    4300008: Line001
+    4300010: Line004
+    4300012: Line005
+    4300014: Object030
+    4300016: Object031
+    4300018: Object035
+    4300020: Object036
+    4300022: Object038
+    4300024: Rectangle030
+    4300026: Sphere005
+    4300028: Sphere006
+    4300030: Tube003
+    4300032: Tube004
+    4300034: Tube005
+    4300036: Tube006
+    4300038: Tube007
+    4300040: Tube008
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 0
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
