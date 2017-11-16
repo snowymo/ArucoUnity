@@ -15,7 +15,7 @@
 #pragma comment(lib, "Ws2_32.lib")
 
 #define DEV_ADDR_0 "172.16.42.90"
-#define DEV_ADDR_1 "192.168.1.78"
+#define DEV_ADDR_1 "216.165.71.230"
 #define DEV_PORT  9591
 #define HOST_PORT 9592
 
