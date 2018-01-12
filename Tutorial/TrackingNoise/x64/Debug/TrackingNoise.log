@@ -1,0 +1,5 @@
+﻿  main.cpp
+d:\projects\arucotutorial\arucounity\tutorial\trackingnoise\main.cpp(83): warning C4305: 'argument': truncation from 'double' to 'float'
+d:\projects\arucotutorial\arucounity\tutorial\trackingnoise\main.cpp(104): warning C4305: 'argument': truncation from 'double' to 'float'
+  TrackingNoise.vcxproj -> D:\Projects\ArucoTutorial\ArucoUnity\Tutorial\x64\Debug\TrackingNoise.exe
+  TrackingNoise.vcxproj -> D:\Projects\ArucoTutorial\ArucoUnity\Tutorial\x64\Debug\TrackingNoise.pdb (Full PDB)

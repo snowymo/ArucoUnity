@@ -1,0 +1,10 @@
+﻿  main.cpp
+main.cpp(83): warning C4305: 'argument': truncation from 'double' to 'float'
+main.cpp(104): warning C4305: 'argument': truncation from 'double' to 'float'
+  Generating code
+  101 of 628 functions (16.1%) were compiled, the rest were copied from previous compilation.
+    15 functions were new in current compilation
+    36 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  TrackingNoise.vcxproj -> D:\Projects\ArucoTutorial\ArucoUnity\Tutorial\x64\Release\TrackingNoise.exe
+  TrackingNoise.vcxproj -> D:\Projects\ArucoTutorial\ArucoUnity\Tutorial\x64\Release\TrackingNoise.pdb (Full PDB)
