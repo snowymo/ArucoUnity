@@ -5,7 +5,7 @@ using namespace cv;
 
 cv::Mat cameraMatrix, distCoeffs, cameraMatrix2, distCoeffs2;
 
-int videoFeed = 2;
+int videoFeed = 1;
 std::string inputSettingsFile = "out_camera_data_122_nofisheye.xml";
 milliseconds ms, ms2;
 
@@ -44,7 +44,7 @@ void captureNoise(cv::Mat imageCopy, std::vector< int > markerIds, std::vector< 
 // 		cv::line(imageCopy, noiseCorners[3], noiseCorners[0], cv::Scalar(0, 255, 0));
 		
 		midpoints[markerIds[i]] = markerCorners[i][mapping[markerIds[i]]];
-		cv::circle(imageCopy, markerCorners[i][mapping[markerIds[i]]], 3, Scalar(mapping[markerIds[i]] * 60, 255, 255));
+		//cv::circle(imageCopy, markerCorners[i][mapping[markerIds[i]]], 3, Scalar(mapping[markerIds[i]] * 60, 255, 255));
 
 		
 		//cv::selectROI(noiseCorners);
@@ -88,7 +88,7 @@ void videoDetect() {
 // 			//cv::line(imageCopy, markerCorners[i][2], markerCorners[i][3], cv::Scalar(0, 255, 255));
 // 		}
 
-		captureNoise(imageCopy, markerIds, markerCorners);
+		captureNoise(image, markerIds, markerCorners);
 
 // 		std::cout << "\nrvecs:\n";
 // 		for(int i = 0; i < rvecs.size(); i++)
