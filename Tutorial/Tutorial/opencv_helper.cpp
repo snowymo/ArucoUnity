@@ -21,12 +21,12 @@ cv::Vec4d toQuaternion(cv::Vec3d rvec)
 	return q;
 }
 
-void createMarker(int markerid) {
+void createMarker(int markerid, int border) {
 	cv::Mat markerImage;
 	cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);
 	//int markerid = 23; //Concretely, this dictionary is composed by 250 markers. In this case, the valid ids go from 0 to 249
 	int markerPixels = 200; //In this case, the output image will have a size of 200x200 pixels
-	cv::aruco::drawMarker(dictionary, markerid, markerPixels, markerImage, 1);
+	cv::aruco::drawMarker(dictionary, markerid, markerPixels, markerImage, border);
 	char buffer[4];
 	_itoa(markerid, buffer, 10);
 	std::string st(buffer);

@@ -1,12 +1,13 @@
 #include "opencv_helper.h"
 #include <chrono>
+#include <fstream>
 using namespace std::chrono;
 using namespace cv;
 
 cv::Mat cameraMatrix, distCoeffs, cameraMatrix2, distCoeffs2;
 
-int videoFeed = 1;
-std::string inputSettingsFile = "out_camera_data_122_nofisheye.xml";
+int videoFeed = 4;
+std::string inputSettingsFile = "out_camera_data_1080p.xml";
 milliseconds ms, ms2;
 
 std::vector< cv::Vec3d > rvecs, tvecs;
@@ -15,6 +16,8 @@ int mapping[4] = { 3,1,0,2 };
 cv::Point2f midpoints[4];
 
 int trainIdx = 0;
+
+//std::fstream trainTXT;
 
 void captureNoise(cv::Mat imageCopy, std::vector< int > markerIds, std::vector< std::vector<cv::Point2f> > markerCorners) {
 	// move four corners to -x direction
@@ -44,7 +47,7 @@ void captureNoise(cv::Mat imageCopy, std::vector< int > markerIds, std::vector< 
 // 		cv::line(imageCopy, noiseCorners[3], noiseCorners[0], cv::Scalar(0, 255, 0));
 		
 		midpoints[markerIds[i]] = markerCorners[i][mapping[markerIds[i]]];
-		//cv::circle(imageCopy, markerCorners[i][mapping[markerIds[i]]], 3, Scalar(mapping[markerIds[i]] * 60, 255, 255));
+		//cv::circle(imageCopy, markerCorners[i][mapping[markerIds[i]]], 3, Scalar(mapping[markerIds[i]] * 60, 255, 255),4);
 
 		
 		//cv::selectROI(noiseCorners);
@@ -56,8 +59,24 @@ void captureNoise(cv::Mat imageCopy, std::vector< int > markerIds, std::vector< 
 		noiseCorners.push_back((midpoints[2] + midpoints[0]) / 2);
 
 		cv::Rect boundRect = boundingRect(Mat(noiseCorners));
+
+		// for debug
 		cv::imshow("roi", imageCopy(boundRect));
-		cv::imwrite("train/training" + std::to_string(trainIdx++) + ".jpg", imageCopy(boundRect));
+
+		// for output
+		char s[7];
+		sprintf(s, "%06d", trainIdx++);
+		s[6] = '\0';
+		std::string pre_file = "train/frame_" + std::string(s);
+		cv::imwrite(pre_file + ".jpg", imageCopy(boundRect));
+
+		double x_ratio = (double)boundRect.x / (double)imageCopy.cols;
+		double y_ratio = (double)boundRect.y / (double)imageCopy.rows;
+		double w_ratio = (double)boundRect.width / (double)imageCopy.cols;
+		double h_ratio = (double)boundRect.height / (double)imageCopy.rows;
+		std::ofstream trainTXT(pre_file + ".txt");
+		trainTXT << "0" << "\t" << x_ratio << "\t" << y_ratio << "\t" << w_ratio << "\t" << h_ratio << "\n";
+		trainTXT.close();
 	}
 		
 }
@@ -67,14 +86,20 @@ void videoDetect() {
 	inputVideo.open(videoFeed);
 	int waitTime = 1;
 	while (inputVideo.grab()) {
-		ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
-		cv::Mat image, imageCopy;
+		//ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+		cv::Mat image, imageCopy, imageCopy2;
 		inputVideo.retrieve(image);
 		image.copyTo(imageCopy);
-		ms2 = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+		
+
+		// undistort
+		//cv::Mat temp = image.clone();
+		cv::undistort(image, imageCopy, cameraMatrix, distCoeffs);
+		imageCopy.copyTo(imageCopy2);
+		//ms2 = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
 
 
-		ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+		//ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
 		std::vector< std::vector<cv::Point2f> > markerCorners;
 		std::vector< int > markerIds;
 		detectMarker(markerIds, imageCopy, markerCorners);
@@ -88,7 +113,7 @@ void videoDetect() {
 // 			//cv::line(imageCopy, markerCorners[i][2], markerCorners[i][3], cv::Scalar(0, 255, 255));
 // 		}
 
-		captureNoise(image, markerIds, markerCorners);
+		captureNoise(imageCopy2, markerIds, markerCorners);
 
 // 		std::cout << "\nrvecs:\n";
 // 		for(int i = 0; i < rvecs.size(); i++)
@@ -97,7 +122,7 @@ void videoDetect() {
 // 		for (int i = 0; i < tvecs.size(); i++)
 // 			std::cout << tvecs[i] << "\t";
 
-		ms2 = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+		//ms2 = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
 		//std::cout << "detect and find pos and quaternion:\t" << (ms2 - ms).count() << "\tms\n";
 
 		for (int i = 0; i < markerIds.size(); i++)
@@ -118,6 +143,8 @@ int main(int argc, char** argv) {
 		videoFeed = atoi(argv[2]);
 	if (argc > 2)
 		inputSettingsFile = argv[3];
+
+
 
 	loadCameraParameters(cameraMatrix, distCoeffs, inputSettingsFile);
 

@@ -9,7 +9,7 @@ int loadCameraParameters(cv::Mat& cameraMatrix, cv::Mat& distCoeffs, std::string
 
 void detectMarker(std::vector< int >& markerIds, cv::Mat& inputImage, std::vector< std::vector<cv::Point2f> >& markerCorners);
 
-void createMarker(int markerid = 0);
+void createMarker(int markerid = 0, int border = 1);
 
 cv::Vec4d toQuaternion(cv::Vec3d rvec);
 

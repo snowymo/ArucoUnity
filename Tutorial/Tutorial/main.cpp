@@ -158,10 +158,17 @@ int main(int argc, char **argv) {
 	//init(t);
 
 	loadCameraParameters(cameraMatrix, distCoeffs, inputSettingsFile);
-	loadCameraParameters(cameraMatrix2, distCoeffs2, inputSettingsFile2);
-
-	videoDetectForTwo();
-
+	if (isDoubleCmrs) {
+		loadCameraParameters(cameraMatrix2, distCoeffs2, inputSettingsFile2);
+	}
+	
+	if (!isDoubleCmrs) {
+		videoDetect();
+	}
+	else {
+		videoDetectForTwo();
+	}
+	
 	cleanupSender(s);
 	
 	return 0;

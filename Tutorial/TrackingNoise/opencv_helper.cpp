@@ -21,6 +21,7 @@ cv::Vec4d toQuaternion(cv::Vec3d rvec)
 	return q;
 }
 
+
 void createMarker(int markerid, int border) {
 	cv::Mat markerImage;
 	cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);
