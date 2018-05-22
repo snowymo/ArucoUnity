@@ -1,3 +1,2 @@
 ﻿  main.cpp
-  Calibration.vcxproj -> D:\Projects\ArucoTutorial\ArucoUnity\Tutorial\x64\Debug\Calibration.exe
-  Calibration.vcxproj -> D:\Projects\ArucoTutorial\ArucoUnity\Tutorial\x64\Debug\Calibration.pdb (Partial PDB)
+c:\users\connor\documents\github\arucounity\tutorial\calibration\main.cpp(7): fatal error C1083: Cannot open include file: 'opencv2/core.hpp': No such file or directory

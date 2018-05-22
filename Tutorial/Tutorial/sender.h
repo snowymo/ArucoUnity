@@ -4,6 +4,9 @@
 #include <cstdint>
 #include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string>
+#include <iostream>
 
 #ifndef _WIN32
 # include "stubs.h"
@@ -14,20 +17,19 @@
 
 #pragma comment(lib, "Ws2_32.lib")
 
-#define DEV_ADDR_0 "172.16.42.90"
-#define DEV_ADDR_1 "216.165.71.230"
-#define DEV_PORT  9591
-#define HOST_PORT 9592
+#define HOST_ADDR "127.0.0.1"
+#define DEV_PORT  20011
+#define HOST_PORT 20010
 
 #define WSAERR(msg) printf(msg ": %d\n", WSAGetLastError())
 
 struct target {
   static const size_t SIZE
-    = 2 * sizeof(uint16_t)
+    = 2 * sizeof(int)
     + 7 * sizeof(double);
 
-  uint16_t cam_id;
-  uint16_t target_id;
+  int cam_id;
+  int target_id;
 
   double pos_x;
   double pos_y;
@@ -39,15 +41,16 @@ struct target {
   double rot_w;
 
   target() {}
-  target(uint16_t c, uint16_t t);
-  target(uint16_t c, uint16_t t, double x, double y, double z, double rx, double ry, double rz, double rw);
+  target(int c, int t);
+  target(int c, int t, double x, double y, double z, double rx, double ry, double rz, double rw);
 };
 
 int serialize(const target &data, char *buf);
 int deserialize(char *buf, target &data);
 
 struct sender {
-  sockaddr_in host, dev0, dev1;
+  sockaddr_in dev0;
+  std::string send_ip;
   WSADATA wsa;
   SOCKET sock;
   size_t devlen;

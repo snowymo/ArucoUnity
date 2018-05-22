@@ -14,27 +14,17 @@ std::vector<target> targets;
 int machineId = 0;
 int videoFeed = 1;
 sender s;
-std::string inputSettingsFile = "out_camera_data.xml";
-
-//
-int machineId2 = 1;
-int videoFeed2 = 3;
-std::string inputSettingsFile2 = "out_camera_data_122_nofisheye.xml";
-
-bool isDoubleCmrs = false;
+std::string inputSettingsFile = "out_camera_data_122_nofisheye.xml";
 
 milliseconds ms, ms2;
 
-
 void checkMachineId(int machineId, std::vector< int > markerIds, std::vector< cv::Vec3d > rvecs, std::vector< cv::Vec3d > tvecs) {
 	for (int i = 0; i < markerIds.size(); i++) {
-		if ((markerIds[i] %3 == 1)) {
-			uint16_t targetId = markerIds[i] / 3;
-			cv::Vec4d q = toQuaternion(rvecs[i]);
-			targets.push_back(target(machineId, targetId,
-				tvecs[i][0], tvecs[i][1], tvecs[i][2],
-				q[0], q[1], q[2], q[3]));
-		}
+		int targetId = markerIds[i];
+		cv::Vec4d q = toQuaternion(rvecs[i]);
+		targets.push_back(target(machineId, targetId,
+			tvecs[i][0], tvecs[i][1], tvecs[i][2],
+			q[0], q[1], q[2], q[3]));
 	}
 	//std::cout << targets.size();
 }
@@ -44,132 +34,209 @@ void sendTargets() {
 		sendData(s, targets[i]);
 }
 
+void findEllipses(cv::Mat input) {
+	std::vector<std::vector<cv::Point> > contours;
+	std::vector<cv::Vec4i> hierarchy;
+
+	cv::Mat imageGray, imageBin;
+	cv::cvtColor(input, imageGray, CV_BGR2GRAY);
+
+	// EXPERIMENTAL: grayscale using one channel
+	//cv::extractChannel(input, imageGray, 2);
+
+	// 3rd parameter (40) is threshold parameter, adjust based on room lighting
+	// TODO: parameterize threshold
+	cv::threshold(imageGray, imageBin, 40, 255.0, cv::THRESH_BINARY);
+
+	// EXPERIMENTAL: Canny edge detection over threshold-based detection
+	//cv::Canny(imageGray, imageBin, 40, 80, 3);
+
+	/// Find contours
+	findContours(imageBin, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
+
+	/// Find the rotated rectangles and ellipses for each contour
+	std::vector<cv::RotatedRect> minRect(contours.size());
+	std::vector<cv::RotatedRect> minEllipse(contours.size());
+
+	for (int i = 0; i < contours.size(); i++)
+	{
+		minRect[i] = cv::minAreaRect(cv::Mat(contours[i]));
+		if (contours[i].size() > 5)
+		{
+			minEllipse[i] = cv::fitEllipse(cv::Mat(contours[i]));
+		}
+	}
+
+	cv::Mat drawing;
+	input.copyTo(drawing);
+	cv::Mat mask;
+
+	int min_index = -1;
+
+	// minimum average value of "black" circle to be considered
+	double min_value = 20;
+	for (int i = 0; i < contours.size(); i++)
+	{
+		mask = cv::Mat::zeros(imageGray.size(), CV_8UC1);
+		cv::Point2f rect_points[4]; minRect[i].points(rect_points);
+
+		// diameter constraints, measured in pixels
+		double MIN_DIAMETER = 20;
+		double MAX_DIAMETER = 600;
+		double size = std::min(cv::norm(rect_points[0] - rect_points[1]), cv::norm(rect_points[0] - rect_points[3]));
+
+		// discard "invalid" contours
+		if (size < 20 || size > 600) continue;
+		if (contours[i].size() <= 5) continue;
+
+		// find "best" ellipse based on darkest average pixel in region
+		ellipse(mask, minEllipse[i], (255, 255, 255), -1, 8);
+		cv::Scalar mean = cv::mean(imageGray, mask);
+		double score = (mean[0] + mean[1] + mean[2]) / 3.0;
+		if (score < min_value) {
+			min_index = i;
+			min_value = score;
+		}
+
+		/* DEBUGGING: uncomment to see ALL valid ellipses, not just best
+		ellipse(drawing, minEllipse[i], color, 2, 8);
+		for (int j = 0; j < 4; j++)
+			line(drawing, rect_points[j], rect_points[(j + 1) % 4], (128, 0, 0), 1, 8);
+		int font = cv::FONT_HERSHEY_SIMPLEX;
+		cv::putText(drawing, std::to_string(score), rect_points[0], font, 1, (255, 255, 255, 255));
+		*/
+	}
+
+	// take best ellipse from above, if it exists
+	if (min_index > -1) {
+		// draw best ellipse
+		cv::Scalar color = cv::Scalar(255, 0, 0);
+		ellipse(drawing, minEllipse[min_index], color, 2, 8);
+		cv::Point2f rect_points[4];
+		minRect[min_index].points(rect_points);
+		// uv are center coords of ellipse in pixels (avg value of bounding box corners)
+		double u = 0;
+		double v = 0;
+		for (int j = 0; j < 4; j++) {
+			line(drawing, rect_points[j], rect_points[(j + 1) % 4], color, 1, 8);
+			u += rect_points[j].x;
+			v += rect_points[j].y;
+		}
+		u /= 4.;
+		v /= 4.;
+
+		// get intrinsic camera params from calibration file
+		double f = cameraMatrix.at<double>(cv::Point(0, 0));
+		double cx = cameraMatrix.at<double>(cv::Point(2, 0));
+		double cy = cameraMatrix.at<double>(cv::Point(2, 1));
+
+		// longest bounding rect edge is the diameter of the circle
+		double l = std::max(cv::norm(rect_points[0] - rect_points[1]), cv::norm(rect_points[0] - rect_points[3]));
+		// real circle is 7cm wide (diameter)
+		// TODO: make this adjustable parameter/calibration variable
+		double l_real = 0.07;
+
+		// calculate real x, y, z coords based on homogenous transformation
+		double z = l_real * f / l;
+		double x = z * (u - cx) / f;
+		double y = z * (cy - v) / f;
+		cv::Vec3d pos = cv::Vec3d(x, y, z);
+
+		// legacy: pass rot and id because example code used them
+		// TODO: remove rot and id
+		cv::Vec3d rot = cv::Vec3d(0, 0, 0);
+		std::vector<int> ids = std::vector<int>();
+		std::vector<cv::Vec3d> rvecs = std::vector<cv::Vec3d>();
+		std::vector<cv::Vec3d> tvecs = std::vector<cv::Vec3d>();
+		rvecs.push_back(rot);
+		tvecs.push_back(pos);
+		ids.push_back(5);
+		targets.clear();
+
+		// add target to be sent
+		checkMachineId(machineId, ids, rvecs, tvecs);
+
+		// send target
+		sendTargets();
+	}
+	
+	// display window
+	cv::imshow("out", drawing);
+}
+
+void arucoDetect(cv::Mat input) {
+	// example ARUCO detector code
+	cv::Mat image, imageGray, imageBin;
+	input.copyTo(imageBin);
+	
+	ms2 = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
+	//std::cout << "retrieve image and copy:\t" << (ms2 - ms).count() << "\tms\n";
+	targets.clear();
+
+	ms = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
+	std::vector< std::vector<cv::Point2f> > markerCorners;
+	std::vector< int > markerIds;
+	detectMarker(markerIds, imageBin, markerCorners);
+
+	std::vector< cv::Vec3d > rvecs, tvecs;
+	cv::aruco::estimatePoseSingleMarkers(markerCorners, 0.0625, cameraMatrix, distCoeffs, rvecs, tvecs);
+
+	ms2 = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
+	//std::cout << "detect and find pos and quaternion:\t" << (ms2 - ms).count() << "\tms\n";
+
+	for (int i = 0; i < markerIds.size(); i++)
+		cv::aruco::drawAxis(imageBin, cameraMatrix, distCoeffs, rvecs[i], tvecs[i], 0.1);
+
+	ms = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
+	checkMachineId(machineId, markerIds, rvecs, tvecs);
+	sendTargets();
+	ms2 = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
+	//std::cout << "check the corresponding marker id and send:\t" << (ms2 - ms).count() << "\tms\n";
+	cv::imshow("out", imageBin);
+}
+
 void videoDetect() {
 	cv::VideoCapture inputVideo;
 	inputVideo.open(videoFeed);
 	int waitTime = 1;
 	while (inputVideo.grab()) {
 		ms = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
-		cv::Mat image, imageCopy;
+		cv::Mat image;
 		inputVideo.retrieve(image);
-		image.copyTo(imageCopy);
-		ms2 = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
-		//std::cout << "retrieve image and copy:\t" << (ms2 - ms).count() << "\tms\n";
-		targets.clear();
-
-		ms = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
-		std::vector< std::vector<cv::Point2f> > markerCorners;
-		std::vector< int > markerIds;
-		detectMarker(markerIds, imageCopy, markerCorners);
-
-		std::vector< cv::Vec3d > rvecs, tvecs;
-		cv::aruco::estimatePoseSingleMarkers(markerCorners, 0.05, cameraMatrix, distCoeffs, rvecs, tvecs);
-
-		ms2 = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
-		//std::cout << "detect and find pos and quaternion:\t" << (ms2 - ms).count() << "\tms\n";
-
-		for (int i = 0; i < markerIds.size(); i++)
-			cv::aruco::drawAxis(imageCopy, cameraMatrix, distCoeffs, rvecs[i], tvecs[i], 0.1);
-
-		ms = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
-		checkMachineId(machineId, markerIds, rvecs, tvecs);
-		sendTargets();
-		ms2 = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
-		//std::cout << "check the corresponding marker id and send:\t" << (ms2 - ms).count() << "\tms\n";
-		cv::imshow("out", imageCopy);
+		findEllipses(image);
+		// comment out findEllipses and uncomment arucoDetect to use aruco-based trackers
+		// arucoDetect(image);
 		char key = (char)cv::waitKey(waitTime);
 		if (key == 27)
 			break;
 	}
 }
-
-void videoDetectForTwo() {
-	cv::VideoCapture inputVideo, inputVideo2;
-	inputVideo.open(videoFeed);
-	inputVideo2.open(videoFeed2);
-	int waitTime = 1;
-	while (inputVideo.grab() && inputVideo2.grab()) {
-		ms = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
-		cv::Mat image, imageCopy, image2, imageCopy2;
-		inputVideo.retrieve(image);
-		inputVideo2.retrieve(image2);
-		image.copyTo(imageCopy);
-		image2.copyTo(imageCopy2);
-		ms2 = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
-		//std::cout << "retrieve image and copy:\t" << (ms2 - ms).count() << "\tms\n";
-		targets.clear();
-
-		ms = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
-		std::vector< std::vector<cv::Point2f> > markerCorners, markerCorners2;
-		std::vector< int > markerIds, markerIds2;
-		detectMarker(markerIds, imageCopy, markerCorners);
-		detectMarker(markerIds2, imageCopy2, markerCorners2);
-
-		std::vector< cv::Vec3d > rvecs, tvecs, rvecs2, tvecs2;
-		cv::aruco::estimatePoseSingleMarkers(markerCorners, 0.05, cameraMatrix, distCoeffs, rvecs, tvecs);
-		cv::aruco::estimatePoseSingleMarkers(markerCorners2, 0.05, cameraMatrix2, distCoeffs2, rvecs2, tvecs2);
-
-		ms2 = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
-		//std::cout << "detect and find pos and quaternion:\t" << (ms2 - ms).count() << "\tms\n";
-
-		for (int i = 0; i < markerIds.size(); i++)
-			cv::aruco::drawAxis(imageCopy, cameraMatrix, distCoeffs, rvecs[i], tvecs[i], 0.1);
-		for (int i = 0; i < markerIds2.size(); i++)
-			cv::aruco::drawAxis(imageCopy2, cameraMatrix2, distCoeffs2, rvecs2[i], tvecs2[i], 0.1);
-
-		ms = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
-		checkMachineId(machineId, markerIds, rvecs, tvecs);
-		checkMachineId(machineId2, markerIds2, rvecs2, tvecs2);
-		sendTargets();
-		ms2 = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
-		//std::cout << "check the corresponding marker id and send:\t" << (ms2 - ms).count() << "\tms\n";
-		cv::imshow("out", imageCopy);
-		cv::imshow("out2", imageCopy2);
-		char key = (char)cv::waitKey(waitTime);
-		if (key == 27)
-			break;
-	}
-}
-
-//void init(target t) {
-//	// at most two targets for each packets
-//	targets.push_back(t);
-//	targets.push_back(t);
-//}
 
 
 int main(int argc, char **argv) {
+	// TODO: these first two args are unnecessary in our setup
 	// first argument: the machine/cam id in the whole configuration
 	// second argument: the camera id of the running machine, default is 0 for backpack
+	// third argument: config file for intrinsic camera params
+	// fourth argument: IP to unicast to (GO device IP)
+	std::string ip;
 	if(argc > 1)
 		machineId = atoi(argv[1]);
 	if (argc > 2)
 		videoFeed = atoi(argv[2]);
 	if (argc > 3)
 		inputSettingsFile = argv[3];
-
-	// temporary for testing two cameras
-
 	if (argc > 4)
-		isDoubleCmrs = true;
+		ip = argv[4];
 
 	s = sender();
+	s.send_ip = ip;
 	initSender(s);
 	//init(t);
 
 	loadCameraParameters(cameraMatrix, distCoeffs, inputSettingsFile);
-	if (isDoubleCmrs) {
-		loadCameraParameters(cameraMatrix2, distCoeffs2, inputSettingsFile2);
-	}
-	
-	if (!isDoubleCmrs) {
-		videoDetect();
-	}
-	else {
-		videoDetectForTwo();
-	}
-	
+	videoDetect();
 	cleanupSender(s);
-	
+
 	return 0;
 }

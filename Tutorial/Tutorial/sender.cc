@@ -1,10 +1,10 @@
 #include "sender.h"
 
-target::target(uint16_t c, uint16_t t) : cam_id(c), target_id(t)
+target::target(int c, int t) : cam_id(c), target_id(t)
 {
 }
 
-target::target(uint16_t c, uint16_t t, double x, double y, double z, double rx, double ry, double rz, double rw)
+target::target(int c, int t, double x, double y, double z, double rx, double ry, double rz, double rw)
 	: cam_id(c), target_id(t), pos_x(x), pos_y(y), pos_z(z), rot_x(rx), rot_y(ry), rot_z(rz), rot_w(rw)
 {
 
@@ -12,10 +12,10 @@ target::target(uint16_t c, uint16_t t, double x, double y, double z, double rx, 
 
 
 int serialize(const target &data, char *buf) {
-  uint16_t *ids = (uint16_t*)buf;
+  int *ids = (int*)buf;
 
-  *ids = htons(data.cam_id);    ids++;
-  *ids = htons(data.target_id); ids++;
+  *ids = data.cam_id;    ids++;
+  *ids = data.target_id; ids++;
 
   double *tra = (double*)ids;
 
@@ -68,35 +68,13 @@ int initSender(sender &s) {
     return 1;
   }
 
-  s.host.sin_family = AF_INET;
-  s.host.sin_port = htons(HOST_PORT);
-  s.host.sin_addr.s_addr = INADDR_ANY;
-
-  int err;
-
-  err = bind(
-    s.sock,
-    (sockaddr*)&s.host,
-    sizeof(s.host)
-  );
-
-  if (err == SOCKET_ERROR) {
-    WSAERR("Bind error");
-  }
-
-  s.devlen = sizeof(s.dev0);
+  
 
   memset((char*)&s.dev0, 0, s.devlen);
-
+  s.devlen = sizeof(s.dev0);
   s.dev0.sin_family = AF_INET;
   s.dev0.sin_port = htons(DEV_PORT);
-  s.dev0.sin_addr.S_un.S_addr = inet_addr(DEV_ADDR_0);
-
-  memset((char*)&s.dev1, 0, s.devlen);
-
-  s.dev1.sin_family = AF_INET;
-  s.dev1.sin_port = htons(DEV_PORT);
-  s.dev1.sin_addr.S_un.S_addr = inet_addr(DEV_ADDR_1);
+  s.dev0.sin_addr.S_un.S_addr = inet_addr(s.send_ip.c_str());
 
   printf("Sender initialized with socket %d\n", s.sock);
 
@@ -131,24 +109,10 @@ int sendData(const sender &s, const target &data) {
     s.devlen
   );
 
-  if (err == SOCKET_ERROR) {
-    WSAERR("Error during send");
-    return 1;
-  }
-
-  err = sendto(
-    s.sock,
-    buf,
-    target::SIZE,
-    0,
-    (struct sockaddr*)&s.dev1,
-    s.devlen
-  );
 
   if (err == SOCKET_ERROR) {
     WSAERR("Error during send");
     return 1;
   }
-
   return 0;
 }

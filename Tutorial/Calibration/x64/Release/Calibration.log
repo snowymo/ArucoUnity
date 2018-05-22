@@ -1,7 +1,6 @@
-﻿  Generating code
-  12 of 846 functions ( 1.4%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
-    4 functions had inline decision re-evaluated but remain unchanged
+﻿  main.cpp
+  Generating code
+  All 846 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
   Finished generating code
-  Calibration.vcxproj -> D:\Projects\ArucoTutorial\ArucoUnity\Tutorial\x64\Release\Calibration.exe
-  Calibration.vcxproj -> D:\Projects\ArucoTutorial\ArucoUnity\Tutorial\x64\Release\Calibration.pdb (Full PDB)
+  Calibration.vcxproj -> C:\Users\connor\Documents\GitHub\ArucoUnity\Tutorial\x64\Release\Calibration.exe
+  Calibration.vcxproj -> C:\Users\connor\Documents\GitHub\ArucoUnity\Tutorial\x64\Release\Calibration.pdb (Full PDB)
