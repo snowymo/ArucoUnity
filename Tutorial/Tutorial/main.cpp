@@ -151,7 +151,6 @@ void findEllipses(cv::Mat input) {
 		rvecs.push_back(rot);
 		tvecs.push_back(pos);
 		ids.push_back(5);
-		targets.clear();
 
 		// add target to be sent
 		checkMachineId(machineId, ids, rvecs, tvecs);
@@ -171,7 +170,6 @@ void arucoDetect(cv::Mat input) {
 	
 	ms2 = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
 	//std::cout << "retrieve image and copy:\t" << (ms2 - ms).count() << "\tms\n";
-	targets.clear();
 
 	ms = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
 	std::vector< std::vector<cv::Point2f> > markerCorners;
@@ -198,14 +196,40 @@ void arucoDetect(cv::Mat input) {
 void videoDetect() {
 	cv::VideoCapture inputVideo;
 	inputVideo.open(videoFeed);
+	std::cout << "Camera Properties:" << std::endl;
+	std::cout << "FPS: " << inputVideo.get(CV_CAP_PROP_BRIGHTNESS) << std::endl;
+	std::cout << "Resolution: (" << inputVideo.get(CV_CAP_PROP_FRAME_WIDTH) << ", " << inputVideo.get(CV_CAP_PROP_FRAME_HEIGHT) << ")" << std::endl;
+	std::cout << "Brightness: " << inputVideo.get(CV_CAP_PROP_FPS) << std::endl;
+	std::cout << "Contrast: " << inputVideo.get(CV_CAP_PROP_CONTRAST) << std::endl;
+	std::cout << "Saturation: " << inputVideo.get(CV_CAP_PROP_SATURATION) << std::endl;
+	std::cout << "Hue: " << inputVideo.get(CV_CAP_PROP_HUE) << std::endl;
+	std::cout << "Gain: " << inputVideo.get(CV_CAP_PROP_GAIN) << std::endl;
+	std::cout << "Exposure: " << inputVideo.get(CV_CAP_PROP_EXPOSURE) << std::endl;
 	int waitTime = 1;
+	int frame = 0;
+	std::cout << "Begin Frames:" << std::endl;
+	std::cout << "Frame\tValid\tPosition X\tPosition Y\tPosition Z" << std::endl;
 	while (inputVideo.grab()) {
+		std::cout << frame << "\t";
+		targets.clear();
 		ms = duration_cast< milliseconds >(system_clock::now().time_since_epoch());
 		cv::Mat image;
 		inputVideo.retrieve(image);
 		findEllipses(image);
 		// comment out findEllipses and uncomment arucoDetect to use aruco-based trackers
 		// arucoDetect(image);
+		
+		if (targets.size() > 0) {
+			std::cout << "true\t";
+			std::cout << targets[0].pos_x << "\t";
+			std::cout << targets[0].pos_y << "\t";
+			std::cout << targets[0].pos_z << std::endl;
+		}
+		else {
+			std::cout << "false\t\t\t" << std::endl;
+		}
+
+		frame++;
 		char key = (char)cv::waitKey(waitTime);
 		if (key == 27)
 			break;
