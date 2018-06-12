@@ -1,0 +1,8 @@
+set (CMAKE_CXX_STANDARD 11)
+cmake_minimum_required(VERSION 2.8)
+project( CVTrackers )
+find_package( OpenCV REQUIRED )
+add_executable( CVTrackers main.cpp sender.cc opencv_helper.cpp )
+INCLUDE_DIRECTORIES( ${OpenCV_INCLUDE_DIRS} )
+INCLUDE_DIRECTORIES( . )
+target_link_libraries( CVTrackers ${OpenCV_LIBS} )

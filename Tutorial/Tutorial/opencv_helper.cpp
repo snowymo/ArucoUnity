@@ -21,6 +21,7 @@ cv::Vec4d toQuaternion(cv::Vec3d rvec)
 	return q;
 }
 
+/*
 void createMarker(int markerid, int border) {
 	cv::Mat markerImage;
 	cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);
@@ -28,17 +29,18 @@ void createMarker(int markerid, int border) {
 	int markerPixels = 200; //In this case, the output image will have a size of 200x200 pixels
 	cv::aruco::drawMarker(dictionary, markerid, markerPixels, markerImage, border);
 	char buffer[4];
-	_itoa(markerid, buffer, 10);
+	itoa(markerid, buffer, 10);
 	std::string st(buffer);
 	std::cout << "imwrite " << markerid << "\n";
 	cv::imwrite("markers/marker_6x6_" + st + ".jpg", markerImage);
 }
+*/
 
 void detectMarker(std::vector< int >& markerIds, cv::Mat& inputImage, std::vector< std::vector<cv::Point2f> >& markerCorners) {
 
 	std::vector< std::vector<cv::Point2f> >  rejectedCandidates;
-	//cv::aruco::DetectorParameters parameters = cv::aruco::DetectorParameters().create();
-	cv::Ptr < cv::aruco::DetectorParameters> parameters = new cv::aruco::DetectorParameters();
+	cv::Ptr <cv::aruco::DetectorParameters> parameters = cv::aruco::DetectorParameters().create();
+	//cv::Ptr < cv::aruco::DetectorParameters> parameters = new cv::aruco::DetectorParameters();
 	cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);
 	cv::aruco::detectMarkers(inputImage, dictionary, markerCorners, markerIds, parameters, rejectedCandidates);
 	if (markerIds.size() > 0)
